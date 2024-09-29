@@ -1,10 +1,11 @@
-import typing as tp
+from string import ascii_lowercase, ascii_uppercase
 
+a_upper, z_upper = ord("A"), ord("Z")
+a_lower, z_lower = ord("a"), ord("z")
 
-def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
+def encrypt_caesar(plaintext):
+
     """
-    Encrypts plaintext using a Caesar cipher.
-
     >>> encrypt_caesar("PYTHON")
     'SBWKRQ'
     >>> encrypt_caesar("python")
@@ -14,15 +15,32 @@ def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
     >>> encrypt_caesar("")
     ''
     """
-    ciphertext = ""
-    # PUT YOUR CODE HERE
+
+    global a_upper, a_lower, z_upper, z_lower
+
+    ciphertext = []
+    for symbol in plaintext:
+
+        if symbol in ascii_uppercase:
+
+            sm_code = (ord(symbol) + 3) % z_upper
+            symbol =  chr(sm_code) if sm_code >= a_upper else chr(sm_code + a_upper - 1)
+
+        elif symbol in ascii_lowercase:
+
+            sm_code = (ord(symbol) + 3) % z_lower
+            symbol = chr(sm_code) if sm_code >= a_lower else chr(sm_code + a_lower - 1)
+
+        ciphertext.append(symbol)
+
+    ciphertext = "".join(ciphertext)
+
     return ciphertext
 
 
-def decrypt_caesar(ciphertext: str, shift: int = 3) -> str:
-    """
-    Decrypts a ciphertext using a Caesar cipher.
+def decrypt_caesar(ciphertext):
 
+    """
     >>> decrypt_caesar("SBWKRQ")
     'PYTHON'
     >>> decrypt_caesar("sbwkrq")
@@ -32,15 +50,26 @@ def decrypt_caesar(ciphertext: str, shift: int = 3) -> str:
     >>> decrypt_caesar("")
     ''
     """
-    plaintext = ""
-    # PUT YOUR CODE HERE
+
+    global a_upper, a_lower, z_upper, z_lower
+
+    plaintext = []
+    for symbol in ciphertext:
+
+        if symbol in ascii_uppercase:
+
+            sm_code = (ord(symbol) - 3)
+            symbol = chr(sm_code) if sm_code >= a_upper else chr(z_upper + 1 - (a_upper - sm_code))
+
+        elif symbol in ascii_lowercase:
+
+            sm_code = (ord(symbol) - 3)
+            symbol = chr(sm_code) if sm_code >= a_lower else chr(z_lower + 1 - (a_lower - sm_code))
+
+        plaintext.append(symbol)
+
+    plaintext = "".join(plaintext)
+
     return plaintext
 
 
-def caesar_breaker_brute_force(ciphertext: str, dictionary: tp.Set[str]) -> int:
-    """
-    Brute force breaking a Caesar cipher.
-    """
-    best_shift = 0
-    # PUT YOUR CODE HERE
-    return best_shift
