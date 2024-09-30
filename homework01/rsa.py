@@ -13,8 +13,13 @@ def is_prime(n: int) -> bool:
     >>> is_prime(8)
     False
     """
-    # PUT YOUR CODE HERE
-    pass
+    s=set()
+    for i in range(1,int(n**0.5)+1):
+        if n%i==0:
+            s.add(i)
+            s.add(n/i)
+    return len(s) == 2
+
 
 
 def gcd(a: int, b: int) -> int:
@@ -26,8 +31,17 @@ def gcd(a: int, b: int) -> int:
     >>> gcd(3, 7)
     1
     """
-    # PUT YOUR CODE HERE
-    pass
+    maks=0
+    if b<a:
+        for e in range(1,b+1):
+            if b%e==0 and a%e==0 and maks<e:
+                maks=e
+    else:
+        for e in range(1,a+1):
+            if b%e==0 and a%e==0 and maks<e:
+                maks=e
+
+    return maks
 
 
 def multiplicative_inverse(e: int, phi: int) -> int:
@@ -38,8 +52,18 @@ def multiplicative_inverse(e: int, phi: int) -> int:
     >>> multiplicative_inverse(7, 40)
     23
     """
-    # PUT YOUR CODE HERE
-    pass
+    t, newt = 0, 1
+    r, newr = phi , e
+
+    while newr != 0:
+        q = r // newr
+        t, newt = newt, t - q * newt
+        r, newr = newr, r - q * newr
+
+    if t < 0:
+        t = t + phi
+
+    return t
 
 
 def generate_keypair(p: int, q: int) -> tp.Tuple[tp.Tuple[int, int], tp.Tuple[int, int]]:
@@ -49,10 +73,10 @@ def generate_keypair(p: int, q: int) -> tp.Tuple[tp.Tuple[int, int], tp.Tuple[in
         raise ValueError("p and q cannot be equal")
 
     # n = pq
-    # PUT YOUR CODE HERE
+    n=p*q
 
     # phi = (p-1)(q-1)
-    # PUT YOUR CODE HERE
+    phi=(p-1)*(q-1)
 
     # Choose an integer e such that e and phi(n) are coprime
     e = random.randrange(1, phi)
