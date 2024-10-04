@@ -15,7 +15,7 @@ def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
     ''
     """
     ciphertext = ""
-    # PUT YOUR CODE HERE
+    # PUT YOUR CODE HERE.
     return ciphertext
 
 
