@@ -14,7 +14,7 @@ def is_prime(n: int) -> bool:
     False
     """
     # PUT YOUR CODE HERE
-    pass
+    pass 
 
 
 def gcd(a: int, b: int) -> int:
