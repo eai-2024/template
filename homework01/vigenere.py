@@ -40,4 +40,17 @@ def decrypt_vigenere(ciphertext: str, keyword: str) -> str:
     """
     plaintext = ""
     # PUT YOUR CODE HERE
+    keyword_length = len(keyword)
+
+    for i in range(len(ciphertext)):
+        c = ciphertext[i]
+        k = keyword[i % keyword_length].upper()
+
+        if c.isalpha():
+            base = ord('A') if c.isupper() else ord('a')
+            shift = ord(k) - ord('A')
+            plaintext += chr((ord(c) - base - shift) % 26 + base)
+        else:
+            plaintext += c
+            
     return plaintext
