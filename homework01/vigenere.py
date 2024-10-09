@@ -28,7 +28,7 @@ def encrypt_vigenere(ciphertext, keyword):
     key_code = []
     keyword = keyword.lower()
     for i in keyword:
-        key_code.append(ord(i) - 97)  # добавляю в key_code ключ(сдвиг) для каждой буквы
+        key_code.append(ord(i) - 97)  # добавляю в key_code ключ|сдвиг для каждой буквы
     for i in range(len(ciphertext)):
         flag_size = "small"
         if (
