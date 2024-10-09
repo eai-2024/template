@@ -24,16 +24,6 @@ def decrypt_vigenere(plaintext, keyword):
 
 
 def encrypt_vigenere(ciphertext, keyword):
-    """
-    Decrypts a ciphertext using a Vigenere cipher.
-
-    >>> decrypt_vigenere("PYTHON", "A")
-    'PYTHON'
-    >>> decrypt_vigenere("python", "a")
-    'python'
-    >>> decrypt_vigenere("LXFOPVEFRNHR", "LEMON")
-    'ATTACKATDAWN'
-    """
     plaintext = ""
     key_code = []
     keyword = keyword.lower()

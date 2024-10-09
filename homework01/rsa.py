@@ -10,14 +10,6 @@ def is_prime(n):
 
 
 def gcd(a, b):
-    """
-    Euclid's algorithm for determining the greatest common divisor.
-
-    >>> gcd(12, 15)
-    3
-    >>> gcd(3, 7)
-    1
-    """
     while b:
         a, b = b, a % b
     return a

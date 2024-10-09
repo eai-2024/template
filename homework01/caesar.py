@@ -1,7 +1,7 @@
 import typing as tp
 
 
-def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
+def encrypt_caesar(plaintext, shift: int = 3):
     ciphertext = ""
     flag_size = "big"
     for i in range(len(plaintext)):
@@ -28,7 +28,7 @@ def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
     return ciphertext
 
 
-def decrypt_caesar(ciphertext: str, shift: int = 3) -> str:
+def decrypt_caesar(ciphertext, shift: int = 3):
     plaintext = ""
     flag_size = "big"
     for i in range(len(ciphertext)):
