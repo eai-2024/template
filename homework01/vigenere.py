@@ -65,4 +65,4 @@ def encrypt_vigenere(ciphertext: str, keyword: str) -> str:
             plaintext += (chr(new_order)).upper()
         else:
             plaintext += chr(new_order)
-    return plaintext
+        return plaintext
