@@ -1,14 +1,4 @@
-def decrypt_vigenere(plaintext: str, keyword: str) -> str:
-    """
-    Encrypts plaintext using a Vigenere cipher.
-
-    >>> encrypt_vigenere("PYTHON", "A")
-    'PYTHON'
-    >>> encrypt_vigenere("python", "a")
-    'python'
-    >>> encrypt_vigenere("ATTACKATDAWN", "LEMON")
-    'LXFOPVEFRNHR'
-    """
+def decrypt_vigenere(plaintext, keyword):
     ciphertext = ""
     key_code = []
     keyword = keyword.lower()
@@ -33,7 +23,7 @@ def decrypt_vigenere(plaintext: str, keyword: str) -> str:
     return ciphertext
 
 
-def encrypt_vigenere(ciphertext: str, keyword: str) -> str:
+def encrypt_vigenere(ciphertext, keyword):
     """
     Decrypts a ciphertext using a Vigenere cipher.
 
