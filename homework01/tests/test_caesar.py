@@ -2,7 +2,7 @@ import random
 import string
 import unittest
 
-import caesar
+from eugenb0t.homework01 import caesar
 
 
 class CaesarTestCase(unittest.TestCase):

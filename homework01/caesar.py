@@ -1,10 +1,8 @@
 import typing as tp
 
 
-def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
+def encrypt_caesar(plaintext, shift=3):
     """
-    Encrypts plaintext using a Caesar cipher.
-
     >>> encrypt_caesar("PYTHON")
     'SBWKRQ'
     >>> encrypt_caesar("python")
@@ -14,15 +12,26 @@ def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
     >>> encrypt_caesar("")
     ''
     """
+
     ciphertext = ""
-    # PUT YOUR CODE HERE
+
+    for symbol in plaintext:
+        char_num = ord(symbol)
+
+        if ord("a") <= char_num <= ord("z"):
+            ciphertext += chr(ord("a") + ((ord(symbol) - ord("a") + shift) % 26))
+
+        elif ord("A") <= char_num <= ord("Z"):
+            ciphertext += chr(ord("A") + ((ord(symbol) - ord("A") + shift) % 26))
+
+        else:
+            ciphertext += chr(char_num)
+
     return ciphertext
 
 
-def decrypt_caesar(ciphertext: str, shift: int = 3) -> str:
+def decrypt_caesar(ciphertext, shift=3):
     """
-    Decrypts a ciphertext using a Caesar cipher.
-
     >>> decrypt_caesar("SBWKRQ")
     'PYTHON'
     >>> decrypt_caesar("sbwkrq")
@@ -33,7 +42,19 @@ def decrypt_caesar(ciphertext: str, shift: int = 3) -> str:
     ''
     """
     plaintext = ""
-    # PUT YOUR CODE HERE
+
+    for symbol in ciphertext:
+        char_num = ord(symbol)
+
+        if ord("a") <= char_num <= ord("z"):
+            plaintext += chr(ord("a") + ((ord(symbol) - ord("a") - shift) % 26))
+
+        elif ord("A") <= char_num <= ord("Z"):
+            plaintext += chr(ord("A") + ((ord(symbol) - ord("A") - shift) % 26))
+
+        else:
+            plaintext += chr(char_num)
+
     return plaintext
 
 
