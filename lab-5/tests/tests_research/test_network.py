@@ -57,5 +57,5 @@ class EgoNetworkTestCase(unittest.TestCase):
             (3, 2),
             (4, 2),
         ]
-        edges = ego_network(user_id=1, friends=target_uids) # user_id=1
+        edges = ego_network(user_id=1, friends=target_uids)  # user_id=1
         self.assertEqual(set(expected_edges), set(edges))

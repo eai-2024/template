@@ -13,6 +13,13 @@ class FriendsResponse:
     count: int
     items: tp.Union[tp.List[int], tp.List[tp.Dict[str, tp.Any]]]
 
+
+class MutualFriends(tp.TypedDict):
+    id: int
+    common_friends: tp.List[int]
+    common_count: int
+
+
 def get_friends(
     user_id: int, count: int = 5000, offset: int = 0, fields: tp.Optional[tp.List[str]] = None
 ) -> FriendsResponse:
@@ -24,7 +31,7 @@ def get_friends(
     assert user_id > 0, "user_id must be positive integer"
     assert fields is None or isinstance(fields, list), "fields must be list of strings or None"
 
-    query_params = {
+    query_params: QueryParams = {
         "access_token": config.VK_CONFIG["access_token"],
         "user_id": user_id,
         "count": count,
@@ -36,84 +43,72 @@ def get_friends(
     response = requests.get(f"{config.VK_CONFIG['domain']}/friends.get", params=query_params)
     if response.status_code != 200:
         raise APIError(f"Error during API request: {response.text}")
+    
     data = response.json()
     if "error" in data:
         raise APIError(data["error"]["error_msg"])
-    return FriendsResponse(
-        count=data["response"]["count"], items=data["response"]["items"]
-    )
 
-class MutualFriends(tp.TypedDict):
-    id: int
-    common_friends: tp.List[int]
-    common_count: int
+    return FriendsResponse(count=data["response"]["count"], items=data["response"]["items"])
+
 
 def get_mutual(
     source_uid: Optional[int] = None,
     target_uid: Optional[int] = None,
     target_uids: Optional[List[int]] = None,
     count: Optional[int] = 100,
-    offset: int = 0
+    offset: int = 0,
 ) -> Union[List[MutualFriends], List[int]]:
     """
     Получить список идентификаторов общих друзей между парой пользователей или группой пользователей.
-
-    :param source_uid: Идентификатор исходного пользователя.
-    :param target_uid: Идентификатор целевого пользователя.
-    :param target_uids: Список идентификаторов целевых пользователей.
-    :param count: Количество общих друзей для возврата.
-    :param offset: Смещение для пагинации.
-    :return: Список общих друзей с их полями (или список идентификаторов, если целевой список пуст).
     """
-    
-    # Проверка, что хотя бы один из идентификаторов целевых пользователей передан
     if not target_uid and not target_uids:
         raise ValueError("Target user ID or target user IDs must be provided.")
 
-    # Параметры запроса к API
-    query_params = {
+    result: Union[List[MutualFriends], List[int]] = []
+
+    if target_uids is not None and len(target_uids) > 100:
+        # Handle cases where target_uids exceeds 100 by splitting into chunks
+        for i in range(0, len(target_uids), 100):
+            chunk = target_uids[i:i + 100]
+            result.extend(
+                get_mutual(
+                    source_uid=source_uid, target_uids=chunk, count=count, offset=offset
+                )
+            )
+            time.sleep(0.34)  # To avoid exceeding request rate limits
+        return result
+
+    query_params: QueryParams = {
         "access_token": config.VK_CONFIG["access_token"],
-        "source_uid": source_uid,
-        "target_uid": target_uid,
+        "source_uid": source_uid or 0,  # Используйте значения по умолчанию, если None
+        "target_uid": target_uid or 0,
         "target_uids": ",".join(map(str, target_uids)) if target_uids else None,
         "count": count,
         "offset": offset,
-        "v": config.VK_CONFIG["version"],  # Версия API
+        "v": config.VK_CONFIG["version"],
     }
 
-    try:
-        # Выполнение GET-запроса к API
-        response = requests.get(f"{config.VK_CONFIG['domain']}/friends.getMutual", params=query_params)
-        response.raise_for_status()  # Если статус не 200, выбрасываем исключение
-    except requests.exceptions.RequestException as e:
-        raise APIError(f"Error during API request: {e}")
+    response = requests.get(f"{config.VK_CONFIG['domain']}/friends.getMutual", params=query_params)
+    if response.status_code != 200:
+        raise APIError(f"Error during API request: {response.text}")
 
-    # Получаем данные из ответа
     data = response.json()
 
-    # Проверяем наличие ошибок в ответе
     if "error" in data:
         raise APIError(data["error"]["error_msg"])
 
-    mutual_friends: List[MutualFriends] = []
+    if target_uids is not None:
+        if target_uid or len(target_uids) == 1:
+            return data["response"]
 
-    # Процессируем полученные данные
-    for item in data["response"]:
-        if isinstance(item, dict):  # Убедимся, что это словарь
-            mutual_friends.append({
-                "id": item["id"],  # Добавляем id
-                "common_friends": item.get("common_friends", []),  # Если данных нет, то пустой список
-                "common_count": item.get("common_count", 0)  # Если данных нет, то 0
-            })
+        for item in data["response"]:
+            result.append(
+                {
+                    "id": item["id"],
+                    "common_friends": item.get("common_friends", []),
+                    "common_count": item.get("common_count", 0),
+                }
+            )
+        return result
 
-    # Добавляем задержку между запросами, чтобы избежать превышения лимитов
-    time.sleep(1)
-
-    # Возвращаем список общих друзей
-    return mutual_friends
-
-
-
-
-
-
+    return data["response"]

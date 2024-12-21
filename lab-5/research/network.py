@@ -6,58 +6,39 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pandas as pd
 
-from vkapi.friends import get_friends, get_mutual
+from vkapi.friends import get_mutual
 
+# Типизация для структуры MutualFriends
+class MutualFriends(tp.TypedDict):
+    id: int
+    common_friends: tp.List[int]
+    common_count: int
 
 def ego_network(user_id: int, friends: tp.List[int]) -> tp.List[tp.Tuple[int, int]]:
-    """
-    Построить эгоцентричный граф друзей с учётом связей между друзьями.
-    """
-    from vkapi.friends import get_mutual
-
     edges = []
 
-    # Добавляем связи между пользователем и его друзьями
-    for friend in friends:
-        edges.append((user_id, friend))
+    # Получаем связи между пользователем и его друзьями, если есть общие
+    mutual_friends: tp.List[MutualFriends] = get_mutual(source_uid=user_id, target_uids=friends)
+    
+    valid_friends = {mf["id"] for mf in mutual_friends if mf["common_count"] > 0}
 
-    # Получаем связи между друзьями
-    mutual_friends = get_mutual(source_uid=user_id, target_uids=friends)
+    for friend in friends:
+        if (
+            friend in valid_friends
+            and user_id != friend
+            and user_id in [mf["id"] for mf in mutual_friends if friend in mf["common_friends"]]
+        ):
+            edges.append((user_id, friend))
 
     for mutual in mutual_friends:
         source = mutual["id"]
         for common_friend in mutual["common_friends"]:
-            edges.append((source, common_friend))
+            if (
+                source != common_friend and (source, common_friend) not in edges
+            ):  # Исключаем самосвязи и дубликаты
+                edges.append((source, common_friend))
 
     return edges
-
-
-#def ego_network(user_id: int, friends: tp.List[int]) -> tp.List[tp.Tuple[int, int]]:
-#    """
-#    Построить эгоцентричный граф друзей.
-#    """
-#    edges = []
-#    for friend in friends:
-#        edges.append((user_id, friend))  # Связь от пользователя к другу
-#       edges.append((friend, user_id))  # Обратная связь от друга к пользователю
-#    return edges
-
-
-##def ego_network(
-##    user_id: tp.Optional[int] = None, friends: tp.Optional[tp.List[int]] = None
-##) -> tp.List[tp.Tuple[int, int]]:
-##    """
-##    Построить эгоцентричный граф друзей.
-##    """
-##    if not friends:
-##        # Если не передан список друзей, то запрашиваем друзей для указанного пользователя
-##        friends_response = get_friends(user_id)
-##        friends = [friend["id"] for friend in friends_response.items]
-##
-##    # Эгоцентричный граф — это граф, в котором центральный узел (пользователь) соединен со всеми его друзьями
-##    edges = [(user_id, friend_id) for friend_id in friends]
-##    return edges
-
 
 
 def plot_ego_network(net: tp.List[tp.Tuple[int, int]]) -> None:
@@ -91,7 +72,7 @@ def get_communities(net: tp.List[tp.Tuple[int, int]]) -> tp.Dict[int, tp.List[in
 
 def describe_communities(
     clusters: tp.Dict[int, tp.List[int]],
-    friends: tp.List[tp.Dict[str, tp.Any]],
+    friends: tp.List[tp.Dict[str, tp.Any]],  # Типизация для списка друзей
     fields: tp.Optional[tp.List[str]] = None,
 ) -> pd.DataFrame:
     if fields is None:
