@@ -11,14 +11,36 @@ from vkapi.friends import get_friends, get_mutual
 
 def ego_network(user_id: int, friends: tp.List[int]) -> tp.List[tp.Tuple[int, int]]:
     """
-    Построить эгоцентричный граф друзей.
+    Построить эгоцентричный граф друзей с учётом связей между друзьями.
     """
+    from vkapi.friends import get_mutual
+
     edges = []
+
+    # Добавляем связи между пользователем и его друзьями
     for friend in friends:
-        edges.append((user_id, friend))  # Связь от пользователя к другу
-        edges.append((friend, user_id))  # Обратная связь от друга к пользователю
+        edges.append((user_id, friend))
+
+    # Получаем связи между друзьями
+    mutual_friends = get_mutual(source_uid=user_id, target_uids=friends)
+
+    for mutual in mutual_friends:
+        source = mutual["id"]
+        for common_friend in mutual["common_friends"]:
+            edges.append((source, common_friend))
+
     return edges
 
+
+#def ego_network(user_id: int, friends: tp.List[int]) -> tp.List[tp.Tuple[int, int]]:
+#    """
+#    Построить эгоцентричный граф друзей.
+#    """
+#    edges = []
+#    for friend in friends:
+#        edges.append((user_id, friend))  # Связь от пользователя к другу
+#       edges.append((friend, user_id))  # Обратная связь от друга к пользователю
+#    return edges
 
 
 ##def ego_network(
